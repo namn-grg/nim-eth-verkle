@@ -63,6 +63,8 @@ suite "main":
     ## Deletes some values
     key[0..^1] = sampleKvps[6][0].fromHex
     doAssert tree.deleteValue(key) == true
+    doAssert tree.getValue(key) == cast[Bytes32]("0000000000000000000000000000000000000000000000000000000000000000")
+
     key[0..^1] = sampleKvps[7][0].fromHex
     doAssert tree.deleteValue(key) == true
     key[0..^1] = sampleKvps[8][0].fromHex

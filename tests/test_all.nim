@@ -91,6 +91,24 @@ suite "main":
 
     doAssert tree.deleteValue(key3) == false
 
+  test "testGetValue":
+    var key1, key2, key3, value: Bytes32
+    key1[0..^1] = "2200000000000000000000000000000000000000000000000000000000000000".fromHex
+    key2[0..^1] = "2200000000000000000000110000000000000000000000000000000000000000".fromHex
+    key3[0..^1] = "3300000000000000000000000000000000000000000000000000000000000000".fromHex 
+    value[0..^1] = "0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef".fromHex 
+
+    var tree = new BranchesNode
+    tree.setValue(key1, value)
+    tree.setValue(key2, value)
+    tree.setValue(key3, value)
+
+    tree.printTree(newFileStream(stdout))
+    echo tree.getValue(key1).toHex
+    echo value.toHex
+
+    # doAssert tree.getValue(key1) == value
+
   test "randomValues_10000":
     ## Writes a larger tree with random nodes to a file
     var tree = new BranchesNode

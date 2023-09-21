@@ -60,15 +60,22 @@ suite "main":
       value[0..^1] = valueHex.fromHex
       tree.setValue(key, value)
 
-    ## Deletes some values
+    ## Delete values and then check if they exist
     key[0..^1] = sampleKvps[6][0].fromHex
     doAssert tree.deleteValue(key) == true
-    doAssert tree.getValue(key) == cast[Bytes32]("0000000000000000000000000000000000000000000000000000000000000000")
+    expect Exception:
+     discard tree.getValue(key)
 
     key[0..^1] = sampleKvps[7][0].fromHex
     doAssert tree.deleteValue(key) == true
+    expect Exception:
+     discard tree.getValue(key)
+
     key[0..^1] = sampleKvps[8][0].fromHex
     doAssert tree.deleteValue(key) == true
+    expect Exception:
+     discard tree.getValue(key)
+
     tree.printTree(newFileStream(stdout)) # prints full tree
 
   test "testDelNonExistingValues":

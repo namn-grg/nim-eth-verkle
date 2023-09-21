@@ -17,7 +17,10 @@ when TraceLogs: import std/strformat
 
 proc getValue(node: ValuesNode, key: Bytes32) : Bytes32 =
   ## Returns the value stored at the given `key`
-  return cast[Bytes32](node.values[key[^1]])    
+  if node.values[key[^1]] != nil:
+    return cast[Bytes32](node.values[key[^1]])   
+  else:
+    raise newException(Exception, "Nil value found")
 
 
 proc getValue*(node: BranchesNode, key: Bytes32) : Bytes32 =
@@ -32,25 +35,24 @@ proc getValue*(node: BranchesNode, key: Bytes32) : Bytes32 =
     current = current.branches[key[depth]].BranchesNode
     inc(depth)
 
-  # If we reached a ValuesNode...
+  # If we reach a ValuesNode...
   var vn = current.branches[key[depth]].ValuesNode
   if vn != nil:
     when TraceLogs: echo &"At node {cast[uint64](current)}. Found ValuesNode at branch '{key[depth].toHex}', depth {depth}, addr {cast[uint64](vn)}"
     when TraceLogs: echo &"    Stem: {vn.stem.toHex}"
 
     # If the stem differs from the key, we can't use that ValuesNode.
-    # This means the value doesn't exist for the given key, so we return 0 value
+    # This means the value doesn't exist for the given key
     var divergence = vn.stem.zip(key).firstMatchAt(tup => tup[0] != tup[1])
     if divergence.found:
-      # return cast[Bytes32]("0")
-      return cast[Bytes32]("0000000000000000000000000000000000000000000000000000000000000000")
+      raise newException(Exception, "Value not found")
 
     # If the stem matches the key, we found the ValuesNode for the key.
     # We return the value at the given key offset
     return cast[Bytes32](current.branches[key[depth]].ValuesNode.getValue(key))
   
-  # If no ValuesNode was found for the key, it means the value doesn't exist. We return 0 value
-  return cast[Bytes32]("0000000000000000000000000000000000000000000000000000000000000000")
+  # If no ValuesNode was found for the key, it means the value doesn't exist.
+  raise newException(Exception, "Value not found")
 
 
 proc setValue(node: ValuesNode, index: byte, value: Bytes32) =
